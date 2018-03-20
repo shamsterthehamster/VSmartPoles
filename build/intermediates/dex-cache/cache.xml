@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<items version="2" >
+
+    <item
+        is-multidex="true"
+        jar="/Users/aimerfarid/Desktop/Senior Design/eddystone-demo/app/build/intermediates/incremental-classes/debug/instant-run-bootstrap.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.0"
+        sha1="82c03450203d4ce49c556f60724b159258dc1bd4">
+        <dex dex="/Users/aimerfarid/Desktop/Senior Design/eddystone-demo/app/build/intermediates/transforms/dex/debug/folders/1000/10000/instant-run-bootstrap_75d235f12ae4327729fa7752e26eb0dfd6e66d08/classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="/Users/aimerfarid/Desktop/Senior Design/eddystone-demo/app/build/intermediates/incremental-runtime-classes/debug/instant-run.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.0"
+        sha1="3be78ebc2706b2e1fe2f12d5726887a92d6c183b">
+        <dex dex="/Users/aimerfarid/Desktop/Senior Design/eddystone-demo/app/build/intermediates/transforms/dex/debug/folders/1000/10000/instant-run_05ab734f773f9d998358c1da058c3f7fdd01fe16/classes.dex" />
+    </item>
+
+</items>
