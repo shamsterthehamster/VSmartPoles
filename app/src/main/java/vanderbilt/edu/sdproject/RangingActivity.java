@@ -6,7 +6,9 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.CompoundButton;
 import android.widget.TextView;
+import android.widget.Switch;
 
 import org.altbeacon.beacon.Beacon;
 import org.altbeacon.beacon.BeaconConsumer;
@@ -26,11 +28,14 @@ public class RangingActivity extends ActionBarActivity implements BeaconConsumer
     @Override
     public void onResume() {
         super.onResume();
-        mBeaconManager = BeaconManager.getInstanceForApplication(this.getApplicationContext());
-        // Detect the main Eddystone-UID frame:
-        mBeaconManager.getBeaconParsers().add(new BeaconParser().
-                setBeaconLayout("s:0-1=feaa,m:2-2=00,p:3-3:-41,i:4-13,i:14-19"));
-        mBeaconManager.bind(this);
+        /*Switch bluetoothSwitch = (Switch) findViewById(R.id.bluetoothSwitch);
+        if(bluetoothSwitch.isChecked()) {
+            mBeaconManager = BeaconManager.getInstanceForApplication(this.getApplicationContext());
+            // Detect the main Eddystone-UID frame:
+            mBeaconManager.getBeaconParsers().add(new BeaconParser().
+                    setBeaconLayout("s:0-1=feaa,m:2-2=00,p:3-3:-41,i:4-13,i:14-19"));
+            mBeaconManager.bind(this);
+        }*/
     }
 
     @Override
@@ -73,6 +78,23 @@ public class RangingActivity extends ActionBarActivity implements BeaconConsumer
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_ranging);
+
+        Switch bluetoothSwitch = (Switch) findViewById(R.id.bluetoothSwitch);
+        bluetoothSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
+                if(isChecked) { // switch = on
+                    mBeaconManager = BeaconManager.getInstanceForApplication(RangingActivity.this.getApplicationContext());
+                    // Detect the main Eddystone-UID frame:
+                    mBeaconManager.getBeaconParsers().add(new BeaconParser().
+                            setBeaconLayout("s:0-1=feaa,m:2-2=00,p:3-3:-41,i:4-13,i:14-19"));
+                    mBeaconManager.bind(RangingActivity.this);
+                }
+                else { // switch = off
+                    mBeaconManager.unbind(RangingActivity.this);
+                }
+            }
+        });
     }
 
     @Override
