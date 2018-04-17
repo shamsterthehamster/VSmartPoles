@@ -1,4 +1,4 @@
-package radiusnetworks.com.eddystonedemo;
+package vanderbilt.edu.sdproject;
 
 import android.os.RemoteException;
 import android.support.v7.app.ActionBarActivity;
