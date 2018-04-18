@@ -10,6 +10,13 @@ import android.widget.CompoundButton;
 import android.widget.TextView;
 import android.widget.Switch;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+
 import org.altbeacon.beacon.Beacon;
 import org.altbeacon.beacon.BeaconConsumer;
 import org.altbeacon.beacon.BeaconManager;
@@ -24,6 +31,11 @@ import java.util.Collection;
 public class RangingActivity extends ActionBarActivity implements BeaconConsumer, RangeNotifier {
 
     private BeaconManager mBeaconManager;
+    static String USER_AGENT = "Mozilla/5.0";
+    static String TOKEN_URL = "https://www.sic-desigocc.com:8443/api/token";
+    static String HEARTBEAT_URL = "https://www.sic-desigocc.com:8443/api/Heartbeat?api_key=DefaultAdmin%3ADefaultAdmin"
+    static String CONTENT_TYPE = "application/x-www-form-urlencoded";
+    static String HOST = "sspct2540";
 
     @Override
     public void onResume() {
@@ -110,5 +122,59 @@ public class RangingActivity extends ActionBarActivity implements BeaconConsumer
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    //STEP ONE: connect to server and request access token (returns full string)
+    //return string must be parsed for token "access_token": "..."
+    public String get_token() throws IOException {
+        String body = "grant_type=password&username=DefaultAdmin&password=DefaultAdmin";
+
+        URL obj = new URL(TOKEN_URL);
+        HttpURLConnection con = (HttpURLConnection) obj.openConnection();
+        con.setRequestMethod("POST");
+        con.setRequestProperty("User-Agent", USER_AGENT);
+        con.setRequestProperty("Content-Type", CONTENT_TYPE);
+        con.setRequestProperty("Host", HOST);
+
+        con.setDoOutput(true);
+        OutputStream os = con.getOutputStream();
+        byte [] body = BODY.getBytes("UTF-8");
+        os.write(body);
+        os.flush();
+        os.close();
+
+        int responseCode = con.getResponseCode();
+
+        BufferedReader in = new BufferedReader (new InputStreamReader(con.getInputStream()));
+        String input;
+        StringBuffer response = new StringBuffer();
+        while((input = in.readLine()) != null) {
+            response.append(input);
+        }
+        in.close();
+        return input;
+    }
+
+    //STEP TWO: Heartbeat connects by giving access code maintained in Step One.
+    //Should return a 200 Status Code
+    public void heartbeat(String access_code) throws IOException {
+        URL obj = new URL(HEARTBEAT_URL);
+        HttpURLConnection con = (HttpURLConnection) obj.openConnection();
+        con.setRequestMethod("POST");
+        con.setRequestProperty("User-Agent", USER_AGENT);
+        con.setRequestProperty("Content-Type", CONTENT_TYPE);
+        con.setRequestProperty("Host", HOST);
+        //not sure if Authorization is a header type, need to see how to send access code
+        con.setRequestProperty("Authorization", access_code.append("Bearer ")); //check if legit
+
+        int responseCode = con.getResponseCode();
+
+        BufferedReader in = new BufferedReader (new InputStreamReader(con.getInputStream()));
+        String input;
+        StringBuffer response = new StringBuffer();
+        while((input = in.readLine()) != null) {
+            response.append(input);
+        }
+        in.close();
     }
 }
