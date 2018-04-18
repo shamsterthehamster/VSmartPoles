@@ -28,14 +28,6 @@ public class RangingActivity extends ActionBarActivity implements BeaconConsumer
     @Override
     public void onResume() {
         super.onResume();
-        /*Switch bluetoothSwitch = (Switch) findViewById(R.id.bluetoothSwitch);
-        if(bluetoothSwitch.isChecked()) {
-            mBeaconManager = BeaconManager.getInstanceForApplication(this.getApplicationContext());
-            // Detect the main Eddystone-UID frame:
-            mBeaconManager.getBeaconParsers().add(new BeaconParser().
-                    setBeaconLayout("s:0-1=feaa,m:2-2=00,p:3-3:-41,i:4-13,i:14-19"));
-            mBeaconManager.bind(this);
-        }*/
     }
 
     @Override
@@ -56,6 +48,7 @@ public class RangingActivity extends ActionBarActivity implements BeaconConsumer
                 // This is a Eddystone-UID frame
                 Identifier namespaceId = beacon.getId1();
                 Identifier instanceId = beacon.getId2();
+                //TODO put api calls here
                 Log.d("RangingActivity", "I see a beacon transmitting namespace id: " + namespaceId +
                         " and instance id: " + instanceId +
                         " approximately " + beacon.getDistance() + " meters away.");
