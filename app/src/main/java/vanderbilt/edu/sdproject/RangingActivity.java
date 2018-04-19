@@ -38,6 +38,8 @@ public class RangingActivity extends ActionBarActivity implements BeaconConsumer
     static String CONTENT_TYPE = "application/x-www-form-urlencoded";
     static String HOST = "sspct2540";
 
+    String token = "";
+
     @Override
     public void onResume() {
         super.onResume();
@@ -91,6 +93,23 @@ public class RangingActivity extends ActionBarActivity implements BeaconConsumer
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_ranging);
+        //below is the code that is currently breaking the app
+        try {
+            token = get_token();
+        }
+        catch(IOException e) {
+            Log.d("RangingActivity", "get token threw exception");
+        }
+        runOnUiThread(new Runnable() {
+            public void run() {
+                ((TextView)RangingActivity.this.findViewById(R.id.debugText)).setText(RangingActivity.this.token);
+            }
+        });
+        try {
+            heartbeat(token);
+        } catch(IOException e) {
+
+        }
 
         Switch bluetoothSwitch = (Switch) findViewById(R.id.bluetoothSwitch);
         bluetoothSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {

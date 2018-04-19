@@ -48,4 +48,14 @@
         android:textColor="@android:color/white"
         android:textSize="21sp" />
 
+    <TextView
+        android:id="@+id/debugText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignStart="@+id/bluetoothSwitch"
+        android:layout_below="@+id/message"
+        android:layout_marginTop="49dp"
+        android:text="TextView"
+        android:textColor="@android:color/white" />
+
 </RelativeLayout>
