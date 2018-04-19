@@ -81,6 +81,13 @@ public class RangingActivity extends ActionBarActivity implements BeaconConsumer
     }
 
     @Override
+    protected void onStop()
+    {
+        super.onStop();
+        mBeaconManager.unbind(this);
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_ranging);
