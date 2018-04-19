@@ -5,4 +5,12 @@
         <!-- Customize your theme here. -->
     </style>
 
+    <style name="lights_dim" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="android:textColor">#FFF69F</item>
+    </style>
+
+    <style name="lights_bright" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="android:textColor">#FFEF52</item>
+    </style>
+
 </resources>

@@ -10,6 +10,7 @@ import android.widget.CompoundButton;
 import android.widget.TextView;
 import android.widget.Switch;
 
+import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -31,6 +32,8 @@ import java.util.Collection;
 public class RangingActivity extends ActionBarActivity implements BeaconConsumer, RangeNotifier {
 
     private BeaconManager mBeaconManager;
+
+    int[] poles = new int[2];
 
     static String USER_AGENT = "Mozilla/5.0";
     static String TOKEN_URL = "https://www.sic-desigocc.com:8443/api/token";
@@ -61,6 +64,7 @@ public class RangingActivity extends ActionBarActivity implements BeaconConsumer
         for (Beacon beacon: beacons) {
             if (beacon.getServiceUuid() == 0xfeaa && beacon.getBeaconTypeCode() == 0x00) {
                 // This is a Eddystone-UID frame
+                //call light_up here
                 Identifier namespaceId = beacon.getId1();
                 Identifier instanceId = beacon.getId2();
                 //TODO put api calls here
@@ -72,6 +76,37 @@ public class RangingActivity extends ActionBarActivity implements BeaconConsumer
                         ((TextView)RangingActivity.this.findViewById(R.id.message)).setText("BLE Beacon is switch on, V Smart Poles!");
                     }
                 });
+            }
+        }
+    }
+
+    public void light_up(int pole) {
+
+        if(poles[pole] <= 0) {
+            poles[pole] = 0;
+            //change text color
+            if(pole == 0) {
+                ((TextView) RangingActivity.this.findViewById(R.id.light_1)).setTextColor(R.style.lights_bright);
+            }
+            else {
+                ((TextView) RangingActivity.this.findViewById(R.id.light_2)).setTextColor(R.style.lights_bright);
+            }
+        }
+        poles[pole]++;
+        try {
+            Thread.sleep(10000); //10 seconds
+        } catch (InterruptedException e) {
+
+        }
+        poles[pole]--;
+        if(poles[pole] <= 0) {
+            poles[pole] = 0;
+            //change text color
+            if(pole == 0) {
+                ((TextView) RangingActivity.this.findViewById(R.id.light_1)).setTextColor(R.style.lights_dim);
+            }
+            else {
+                ((TextView) RangingActivity.this.findViewById(R.id.light_2)).setTextColor(R.style.lights_dim);
             }
         }
     }
@@ -93,6 +128,8 @@ public class RangingActivity extends ActionBarActivity implements BeaconConsumer
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_ranging);
+        poles[0] = 0;
+        poles[1] = 0;
         //below is the code that is currently breaking the app
         try {
             token = get_token();
@@ -164,11 +201,11 @@ public class RangingActivity extends ActionBarActivity implements BeaconConsumer
         con.setRequestProperty("Host", HOST);
 
         con.setDoOutput(true);
-        OutputStream os = con.getOutputStream();
+        OutputStream out = new BufferedOutputStream(con.getOutputStream());
         byte [] BODY = body.getBytes("UTF-8");
-        os.write(BODY);
-        os.flush();
-        os.close();
+        out.write(BODY);
+        out.flush();
+        out.close();
 
         int responseCode = con.getResponseCode();
 
