@@ -48,20 +48,10 @@
         android:textColor="@android:color/white"
         android:textSize="21sp" />
 
-    <TextView
-        android:id="@+id/debugText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignStart="@+id/bluetoothSwitch"
-        android:layout_below="@+id/message"
-        android:layout_marginTop="49dp"
-        android:text="TextView"
-        android:textColor="@android:color/white" />
-
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/debugText"
+        android:layout_below="@id/bluetoothSwitch"
         android:orientation="horizontal"
         android:id="@+id/linearLayout">
 
@@ -69,6 +59,7 @@
             android:id="@+id/pole1_label"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
+            android:layout_marginLeft="20dp"
             android:gravity="center_vertical"
             android:text="Light Pole 1:"
             android:textColor="@android:color/white" />
@@ -77,13 +68,12 @@
             android:id="@+id/light_1"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:layout_alignLeft="@+id/pole1_label"
-            android:layout_centerVertical="true"
-            android:layout_marginLeft="15dp"
+            android:layout_below="@+id/debugText"
+            android:layout_marginStart="18dp"
             android:layout_toEndOf="@+id/message"
             android:gravity="center_vertical"
             android:text="●"
-            android:textColor="#FFF69F"
+            android:textColor="#b5b29b"
             android:textSize="70sp" />
     </LinearLayout>
 
@@ -91,12 +81,14 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/linearLayout"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:id="@+id/linearLayout2">
 
         <TextView
             android:id="@+id/pole2_label"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
+            android:layout_marginLeft="20dp"
             android:gravity="center_vertical"
             android:text="Light Pole 2:"
             android:textColor="@android:color/white" />
@@ -108,7 +100,7 @@
             android:layout_marginLeft="15dp"
             android:gravity="center_vertical"
             android:text="●"
-            android:textColor="#FFF69F"
+            android:textColor="#b5b29b"
             android:textSize="70sp" />
     </LinearLayout>
 

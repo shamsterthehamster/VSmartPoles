@@ -1,5 +1,6 @@
 package vanderbilt.edu.sdproject;
 
+import android.graphics.Color;
 import android.os.RemoteException;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
@@ -33,7 +34,12 @@ public class RangingActivity extends ActionBarActivity implements BeaconConsumer
 
     private BeaconManager mBeaconManager;
 
-    int[] poles = new int[2];
+    //int[] poles = new int[2];
+    boolean[] poles_on = new boolean[2];
+    boolean[] beacon_found = new boolean[2];
+
+    public static final String dim_light = "#b5b29b";//"#f2ecae";
+    public static final String bright_light = "#edd802";
 
     static String USER_AGENT = "Mozilla/5.0";
     static String TOKEN_URL = "https://www.sic-desigocc.com:8443/api/token";
@@ -61,6 +67,8 @@ public class RangingActivity extends ActionBarActivity implements BeaconConsumer
 
     @Override
     public void didRangeBeaconsInRegion(Collection<Beacon> beacons, Region region) {
+        beacon_found[0] = false;
+        beacon_found[1] = false;
         for (Beacon beacon: beacons) {
             if (beacon.getServiceUuid() == 0xfeaa && beacon.getBeaconTypeCode() == 0x00) {
                 // This is a Eddystone-UID frame
@@ -68,47 +76,105 @@ public class RangingActivity extends ActionBarActivity implements BeaconConsumer
                 Identifier namespaceId = beacon.getId1();
                 Identifier instanceId = beacon.getId2();
                 //TODO put api calls here
+                if(beacon.getDistance() < 2) {
+                    if(instanceId.toHexString().equals("0x000000000001")) {
+                        light_up(1);
+                        beacon_found[0] = true;
+                    }
+                    if(instanceId.toHexString().equals("0x000000000002")) {
+                        light_up(2);
+                        beacon_found[1] = true;
+                    }
+                }
                 Log.d("RangingActivity", "I see a beacon transmitting namespace id: " + namespaceId +
                         " and instance id: " + instanceId +
                         " approximately " + beacon.getDistance() + " meters away.");
-                runOnUiThread(new Runnable() {
+                /*runOnUiThread(new Runnable() {
                     public void run() {
                         ((TextView)RangingActivity.this.findViewById(R.id.message)).setText("BLE Beacon is switch on, V Smart Poles!");
                     }
-                });
+                });*/
             }
+        }
+        if(!beacon_found[0] && !beacon_found[1]) {
+            Log.d("no beacon found", "NO beacons found");
+            Log.d("no beacon", "pole 2 state: " + poles_on[1]);
+        }
+        //Log.d("no beacon found", "NO beacons found");
+        if(!beacon_found[0] && poles_on[0]) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    ((TextView) RangingActivity.this.findViewById(R.id.light_1)).setTextColor(Color.parseColor(dim_light));
+                }
+            });
+            poles_on[0] = false;
+        }
+        if(!beacon_found[1] && poles_on[1]) {
+            Log.d("turn off", "beacon 2 should turn OFF");
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    ((TextView) RangingActivity.this.findViewById(R.id.light_2)).setTextColor(Color.parseColor(dim_light));
+                }
+            });
+            poles_on[1] = false;
         }
     }
 
     public void light_up(int pole) {
 
-        if(poles[pole] <= 0) {
-            poles[pole] = 0;
+        //if(poles[pole] <= 0) {
+            //poles[pole] = 0;
             //change text color
-            if(pole == 0) {
-                ((TextView) RangingActivity.this.findViewById(R.id.light_1)).setTextColor(R.style.lights_bright);
+            Log.d("light up", "got here!!");
+            if(pole == 1 && !poles_on[0]) {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        ((TextView) RangingActivity.this.findViewById(R.id.light_1)).setTextColor(Color.parseColor(bright_light));
+                    }
+                });
+                poles_on[0] = true;
             }
-            else {
-                ((TextView) RangingActivity.this.findViewById(R.id.light_2)).setTextColor(R.style.lights_bright);
+            else if (pole == 2 && !poles_on[1]){
+                Log.d("turn on", "beacon 2 should turn ON");
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        ((TextView) RangingActivity.this.findViewById(R.id.light_2)).setTextColor(Color.parseColor(bright_light));
+                    }
+                });
+                poles_on[1] = true;
             }
-        }
-        poles[pole]++;
-        try {
+        //}
+        //poles[pole]++;
+        /*try {
             Thread.sleep(10000); //10 seconds
         } catch (InterruptedException e) {
 
         }
-        poles[pole]--;
+        //poles[pole]--;
         if(poles[pole] <= 0) {
             poles[pole] = 0;
             //change text color
             if(pole == 0) {
-                ((TextView) RangingActivity.this.findViewById(R.id.light_1)).setTextColor(R.style.lights_dim);
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        ((TextView) RangingActivity.this.findViewById(R.id.light_1)).setTextColor(R.style.lights_dim);
+                    }
+                });
             }
             else {
-                ((TextView) RangingActivity.this.findViewById(R.id.light_2)).setTextColor(R.style.lights_dim);
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        ((TextView) RangingActivity.this.findViewById(R.id.light_2)).setTextColor(R.style.lights_dim);
+                    }
+                });
             }
-        }
+        }*/
     }
 
     @Override
@@ -128,10 +194,10 @@ public class RangingActivity extends ActionBarActivity implements BeaconConsumer
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_ranging);
-        poles[0] = 0;
-        poles[1] = 0;
+        //poles[0] = 0;
+        //poles[1] = 0;
         //below is the code that is currently breaking the app
-        try {
+        /*try {
             token = get_token();
         }
         catch(IOException e) {
@@ -146,13 +212,27 @@ public class RangingActivity extends ActionBarActivity implements BeaconConsumer
             heartbeat(token);
         } catch(IOException e) {
 
-        }
+        }*/
+        /*ToggleButton test = (ToggleButton) findViewById(R.id.toggleButton);
+        test.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                if(b) {
+                    ((TextView)findViewById(R.id.light_1)).setTextColor(Color.parseColor(bright_light));
+                }
+                else{
+                    ((TextView)findViewById(R.id.light_1)).setTextColor(Color.parseColor(dim_light));
+                }
+            }
+        });*/
 
         Switch bluetoothSwitch = (Switch) findViewById(R.id.bluetoothSwitch);
         bluetoothSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
                 if(isChecked) { // switch = on
+                    poles_on[0] = false;
+                    poles_on[1] = false;
                     mBeaconManager = BeaconManager.getInstanceForApplication(RangingActivity.this.getApplicationContext());
                     // Detect the main Eddystone-UID frame:
                     mBeaconManager.getBeaconParsers().add(new BeaconParser().
