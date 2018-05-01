@@ -36,10 +36,20 @@ public class RangingActivity extends ActionBarActivity implements BeaconConsumer
 
     private BeaconManager mBeaconManager;
 
+    // pole1 and pole2 are buffers to keep track of the last 5 seconds worth of data from the beacon
+    // a cell in the array will be set to true if it was found that second and false if it was not
+    // this way any noise can be eliminated from the signal. i keeps track of the index in the arrays
     boolean[] pole1 = new boolean[5];
     boolean[] pole2 = new boolean[5];
     int i = 0;
+
+    // poles_on keeps track of the current status of the poles. This way if the pole is already on and 
+    // we detect the bluetooth signal, we will not request to turn it on again. this is also useful for
+    // determining when to turn off the poles (current condition for turning off the poles is when all
+    // values in the poleX array are false and poles_on[x] is true)
     boolean[] poles_on = new boolean[2];
+
+    // beacon_found stores whether or not the beacon was detected in that 1 second cycle
     boolean[] beacon_found = new boolean[2];
 
     public static final String dim_light = "#b5b29b";//"#f2ecae";
@@ -68,7 +78,10 @@ public class RangingActivity extends ActionBarActivity implements BeaconConsumer
         }
         mBeaconManager.setRangeNotifier(this);
     }
-
+ 
+    // didRangeBeaconsInRegion is a callback function that is triggered every second by
+    // the android eddystone api we used. Each second it loops through an array that stores
+    // information about each (if any) beacon that was found that second
     @Override
     public void didRangeBeaconsInRegion(Collection<Beacon> beacons, Region region) {
         beacon_found[0] = false;
@@ -76,11 +89,11 @@ public class RangingActivity extends ActionBarActivity implements BeaconConsumer
         for (Beacon beacon: beacons) {
             if (beacon.getServiceUuid() == 0xfeaa && beacon.getBeaconTypeCode() == 0x00) {
                 // This is a Eddystone-UID frame
-                //call light_up here
                 Identifier namespaceId = beacon.getId1();
                 Identifier instanceId = beacon.getId2();
-                //TODO put api calls here
-                if(beacon.getDistance() < 1.5) {
+                // 1.5 meters is the current range we set for beacon detection. to make the range
+                // of detection wider, simply change this number
+                if(beacon.getDistance() < 1.5) { 
                     if(instanceId.toHexString().equals("0x000000000001")) {
                         light_up(1);
                         beacon_found[0] = true;
@@ -95,11 +108,6 @@ public class RangingActivity extends ActionBarActivity implements BeaconConsumer
                 Log.d("RangingActivity", "I see a beacon transmitting namespace id: " + namespaceId +
                         " and instance id: " + instanceId +
                         " approximately " + beacon.getDistance() + " meters away.");
-                /*runOnUiThread(new Runnable() {
-                    public void run() {
-                        ((TextView)RangingActivity.this.findViewById(R.id.message)).setText("BLE Beacon is switch on, V Smart Poles!");
-                    }
-                });*/
             }
         }
         if(!beacon_found[0]) {
@@ -109,11 +117,13 @@ public class RangingActivity extends ActionBarActivity implements BeaconConsumer
             pole2[i] = false;
         }
         i = (i+1)%5;
-        if(!beacon_found[0] && !beacon_found[1]) {
-            Log.d("no beacon found", "NO beacons found");
-            Log.d("no beacon", "pole 2 state: " + poles_on[1]);
-        }
-        //Log.d("no beacon found", "NO beacons found");
+        // if(!beacon_found[0] && !beacon_found[1]) { //this is for debugging purposes
+        //     Log.d("no beacon found", "NO beacons found");
+        //     Log.d("no beacon", "pole 2 state: " + poles_on[1]);
+        // }
+
+        // turn the light pole dimmer if the beacon was not found this cycle and the pole is currently on
+        // and the buffer of the past 5 seconds is all false
         if(!beacon_found[0] && poles_on[0] && allFalse(pole1)) {
             runOnUiThread(new Runnable() {
                 @Override
@@ -140,13 +150,14 @@ public class RangingActivity extends ActionBarActivity implements BeaconConsumer
         return true;
     }
 
+
+    // this function lights up the light poles if their bluetooth signal was detected and the light is not already on
     public void light_up(int pole) {
 
-        //if(poles[pole] <= 0) {
-            //poles[pole] = 0;
             //change text color
             Log.d("light up", "got here!!");
             if(pole == 1 && !poles_on[0]) {
+                //TODO put api calls here. This is where the siemens api should be called to light up light poles
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
@@ -157,6 +168,7 @@ public class RangingActivity extends ActionBarActivity implements BeaconConsumer
             }
             else if (pole == 2 && !poles_on[1]){
                 Log.d("turn on", "beacon 2 should turn ON");
+                //TODO put api calls here. This is where the siemens api should be called to light up light poles
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
@@ -165,34 +177,6 @@ public class RangingActivity extends ActionBarActivity implements BeaconConsumer
                 });
                 poles_on[1] = true;
             }
-        //}
-        //poles[pole]++;
-        /*try {
-            Thread.sleep(10000); //10 seconds
-        } catch (InterruptedException e) {
-
-        }
-        //poles[pole]--;
-        if(poles[pole] <= 0) {
-            poles[pole] = 0;
-            //change text color
-            if(pole == 0) {
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        ((TextView) RangingActivity.this.findViewById(R.id.light_1)).setTextColor(R.style.lights_dim);
-                    }
-                });
-            }
-            else {
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        ((TextView) RangingActivity.this.findViewById(R.id.light_2)).setTextColor(R.style.lights_dim);
-                    }
-                });
-            }
-        }*/
     }
 
     @Override
@@ -216,36 +200,8 @@ public class RangingActivity extends ActionBarActivity implements BeaconConsumer
             pole1[i] = false;
             pole2[i] = false;
         }
-        //below is the code that is currently breaking the app
-        /*try {
-            token = get_token();
-        }
-        catch(IOException e) {
-            Log.d("RangingActivity", "get token threw exception");
-        }
-        runOnUiThread(new Runnable() {
-            public void run() {
-                ((TextView)RangingActivity.this.findViewById(R.id.debugText)).setText(RangingActivity.this.token);
-            }
-        });
-        try {
-            heartbeat(token);
-        } catch(IOException e) {
 
-        }*/
-        /*ToggleButton test = (ToggleButton) findViewById(R.id.toggleButton);
-        test.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                if(b) {
-                    ((TextView)findViewById(R.id.light_1)).setTextColor(Color.parseColor(bright_light));
-                }
-                else{
-                    ((TextView)findViewById(R.id.light_1)).setTextColor(Color.parseColor(dim_light));
-                }
-            }
-        });*/
-
+        // when the feature switch is checked to be on, initialize the bluetooth manager
         Switch bluetoothSwitch = (Switch) findViewById(R.id.bluetoothSwitch);
         bluetoothSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
