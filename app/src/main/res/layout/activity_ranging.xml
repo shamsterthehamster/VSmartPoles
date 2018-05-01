@@ -45,10 +45,10 @@
         android:layout_height="wrap_content"
         android:layout_alignStart="@+id/bluetoothSwitch"
         android:layout_below="@+id/bluetoothSwitch"
-        android:layout_marginTop="2dp"
         android:layout_marginRight="8dp"
+        android:layout_marginTop="2dp"
         android:fontFamily="sans-serif-condensed"
-        android:text="This feature uses bluetooth to detect light poles and brighten any near you."
+        android:text="Turn this feature ON to brighten nearby light poles."
         android:textColor="@android:color/white"
         android:textSize="14sp" />
 
@@ -61,7 +61,7 @@
 
         <LinearLayout
             android:id="@+id/linearLayout"
-            android:layout_width="wrap_content"
+            android:layout_width="101dp"
             android:layout_height="match_parent"
             android:layout_alignRight="@+id/linearLayout2"
             android:layout_marginLeft="45dp"
@@ -71,6 +71,7 @@
                 android:id="@+id/pole1_label"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:fontFamily="sans-serif-condensed"
                 android:gravity="center_horizontal"
                 android:text="Light Pole 1:"
                 android:textColor="@android:color/white"
@@ -81,7 +82,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/pole1_label"
-                android:layout_marginStart="18dp"
+                android:layout_marginStart="15dp"
                 android:gravity="center_horizontal"
                 android:text="●"
                 android:textColor="#b5b29b"
@@ -90,16 +91,16 @@
 
         <LinearLayout
             android:id="@+id/linearLayout2"
-            android:layout_width="wrap_content"
+            android:layout_width="101dp"
             android:layout_height="match_parent"
-            android:layout_marginLeft="100dp"
+            android:layout_marginLeft="80dp"
             android:orientation="vertical">
 
             <TextView
                 android:id="@+id/pole2_label"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:gravity="center_horizontal"
+                android:fontFamily="sans-serif-condensed"
                 android:text="Light Pole 2:"
                 android:textColor="@android:color/white"
                 android:textSize="18sp" />
@@ -108,6 +109,7 @@
                 android:id="@+id/light_2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="15dp"
                 android:gravity="center_horizontal"
                 android:layout_marginStart="18dp"
                 android:text="●"
