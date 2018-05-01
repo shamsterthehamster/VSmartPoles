@@ -24,4 +24,5 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'com.android.support:appcompat-v7:22.1.0'
     implementation 'org.altbeacon:android-beacon-library:2.3+'
+    implementation 'com.squareup.okhttp3:okhttp:3.9.0'
 }
