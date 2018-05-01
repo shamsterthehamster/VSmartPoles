@@ -261,54 +261,81 @@ public class RangingActivity extends ActionBarActivity implements BeaconConsumer
     //STEP ONE: connect to server and request access token (returns full string)
     //return string must be parsed for token "access_token": "..."
     public String get_token() throws IOException {
-        String body = "grant_type=password&username=DefaultAdmin&password=DefaultAdmin";
+        OkHttpClient client = new OkHttpClient();
+        RequestBody body = RequestBody.create(APPLICATION_FORM_URLENCODED_TYPE, "grant_type=password&username=DefaultAdmin&password=DefaultAdmin");
 
-        URL obj = new URL(TOKEN_URL);
-        HttpURLConnection con = (HttpURLConnection) obj.openConnection();
-        con.setRequestMethod("POST");
-        con.setRequestProperty("User-Agent", USER_AGENT);
-        con.setRequestProperty("Content-Type", CONTENT_TYPE);
-        con.setRequestProperty("Host", HOST);
+        Request request = new Request.Builder()
+        .url("https://www.sic-desigocc.com:8443/api/token")
+        .post(body)
+        .addHeader("Content-Type", "application/x-www-form-urlencoded")
+        .addHeader("Host", "sspct2540")
+        .addHeader("Cache-Control", "no-cache")
+        .addHeader("Postman-Token", "6868035e-4a27-40d9-b600-3a657a432264")
+        .build();
 
-        con.setDoOutput(true);
-        OutputStream out = new BufferedOutputStream(con.getOutputStream());
-        byte [] BODY = body.getBytes("UTF-8");
-        out.write(BODY);
-        out.flush();
-        out.close();
-
-        int responseCode = con.getResponseCode();
-
-        BufferedReader in = new BufferedReader (new InputStreamReader(con.getInputStream()));
-        String input;
-        StringBuffer response = new StringBuffer();
-        while((input = in.readLine()) != null) {
-            response.append(input);
-        }
-        in.close();
-        return input;
+        Response response = client.newCall(request).execute();
+        return response.toString();
     }
 
     //STEP TWO: Heartbeat connects by giving access code maintained in Step One.
     //Should return a 200 Status Code
     public void heartbeat(String access_code) throws IOException {
-        URL obj = new URL(HEARTBEAT_URL);
-        HttpURLConnection con = (HttpURLConnection) obj.openConnection();
-        con.setRequestMethod("POST");
-        con.setRequestProperty("User-Agent", USER_AGENT);
-        con.setRequestProperty("Content-Type", CONTENT_TYPE);
-        con.setRequestProperty("Host", HOST);
-        //not sure if Authorization is a header type, need to see how to send access code
-        con.setRequestProperty("Authorization", access_code.concat("Bearer ")); //check if legit
+        OkHttpClient client = new OkHttpClient();
 
-        int responseCode = con.getResponseCode();
+        Request request = new Request.Builder()
+        .url("https://www.sic-desigocc.com:8443/api/Heartbeat?api_key=DefaultAdmin%3ADefaultAdmin")
+        .post(null)
+        .addHeader("Content-Type", "application/x-www-form-urlencoded")
+        .addHeader("Host", "sspct2540")
+        .addHeader("Authorization", "Bearer " + access_code)
+        .addHeader("Cache-Control", "no-cache")
+        .addHeader("Postman-Token", "a413c251-4e81-4441-94f4-2cf7bcd23fd3")
+        .build();
 
-        BufferedReader in = new BufferedReader (new InputStreamReader(con.getInputStream()));
-        String input;
-        StringBuffer response = new StringBuffer();
-        while((input = in.readLine()) != null) {
-            response.append(input);
-        }
-        in.close();
+        Response response = client.newCall(request).execute(); //200 means it's working
+    }
+
+    //STEP THREE: Turn light pole on (corresponding off method below) 
+    public void lightpole_on(String ObjectId, String access_code) throws IOException {
+        OkHttpClient client = new OkHttpClient();
+
+        MediaType mediaType = MediaType.parse("application/json");
+        RequestBody body = RequestBody.create(mediaType, 
+            "[\n\t{\n\t\t\"Name\" : \"Value\", \n\t\t\"DataType\" : \"ExtendedEnum\", \n\t\t\"Value\" : \" 8\"\n\t}\n\t\n]");
+        Request request = new Request.Builder()
+        .url("https://www.sic-desigocc.com:8443/api/commands/" + ObjectId + 
+            ".Present_Value/Write?api_key=DefaultAdmin%3ADefaultAdmin")
+        .post(body)
+        .addHeader("Content-Type", "application/json")
+        .addHeader("Host", "sspct2540")
+        .addHeader("Accept", "application/json")
+        .addHeader("Authorization", "Bearer " + access_code)
+        .addHeader("Cache-Control", "no-cache")
+        .addHeader("Postman-Token", "0b738c7c-e599-4773-b3d4-a9e227e76544")
+        .build();
+
+        Response response = client.newCall(request).execute();
+    }
+
+    //STEP FOUR: Turn light pole off (can adjust value in body, replace '0' with 1, 2, or 3 to dim)
+    public void lightpole_off(String ObjectId, String access_code) throws IOException {
+        OkHttpClient client = new OkHttpClient();
+
+        MediaType mediaType = MediaType.parse("application/json");
+        RequestBody body = RequestBody.create(mediaType, 
+            "[\n\t{\n\t\t\"Name\" : \"Value\", \n\t\t\"DataType\" : \"ExtendedEnum\", \n\t\t\"Value\" : \" 0\"\n\t}\n\t\n]");
+        Request request = new Request.Builder()
+        .url("https://www.sic-desigocc.com:8443/api/commands/" + ObjectId + 
+            ".Present_Value/Write?api_key=DefaultAdmin%3ADefaultAdmin")
+        .post(body)
+        .addHeader("Content-Type", "application/json")
+        .addHeader("Host", "sspct2540")
+        .addHeader("Accept", "application/json")
+        .addHeader("Authorization", "Bearer " + access_code)
+        .addHeader("Cache-Control", "no-cache")
+        .addHeader("Postman-Token", "0b738c7c-e599-4773-b3d4-a9e227e76544")
+        .build();
+
+        Response response = client.newCall(request).execute();
     }
 }
