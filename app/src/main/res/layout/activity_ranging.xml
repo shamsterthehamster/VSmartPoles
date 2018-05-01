@@ -111,7 +111,6 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="15dp"
                 android:gravity="center_horizontal"
-                android:layout_marginStart="18dp"
                 android:text="●"
                 android:textColor="#b5b29b"
                 android:textSize="110sp" />

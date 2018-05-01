@@ -258,6 +258,7 @@ public class RangingActivity extends ActionBarActivity implements BeaconConsumer
         return super.onOptionsItemSelected(item);
     }
 
+    /*
     //STEP ONE: connect to server and request access token (returns full string)
     //return string must be parsed for token "access_token": "..."
     public String get_token() throws IOException {
@@ -337,5 +338,5 @@ public class RangingActivity extends ActionBarActivity implements BeaconConsumer
         .build();
 
         Response response = client.newCall(request).execute();
-    }
+    }*/
 }
